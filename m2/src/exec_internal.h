@@ -12,24 +12,23 @@
 
 #define HANDLE_HALT  { finished = 1; }
 
-#define HANDLE_INC  {\
+#define _HANDLE_OP_1REG_INT(statement)  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
           CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1]++; \
+          statement; \
         }
 
-#define HANDLE_DEC  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1]--; \
-        }
+#define HANDLE_INC  _HANDLE_OP_1REG_INT(reg_i[r1]++)
+#define HANDLE_DEC  _HANDLE_OP_1REG_INT(reg_i[r1]--)
 
-#define HANDLE_ADD  {\
+#define _HANDLE_OP_2REGS_INT(statement)  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
           r2 = LO_NIBBLE(instrBuffer[1]); \
           CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] += reg_i[r2]; \
+          statement; \
         }
+
+#define HANDLE_ADD  _HANDLE_OP_2REGS_INT(reg_i[r1] += reg_i[r2])
 
 #define HANDLE_ADDI  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -38,19 +37,8 @@
         }
 
 
-#define HANDLE_SUB  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] -= reg_i[r2]; \
-        }
-
-#define HANDLE_MUL  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] *= reg_i[r2]; \
-        }
+#define HANDLE_SUB  _HANDLE_OP_2REGS_INT(reg_i[r1] -= reg_i[r2])
+#define HANDLE_MUL  _HANDLE_OP_2REGS_INT(reg_i[r1] *= reg_i[r2])
 
 #define HANDLE_DIV  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -62,39 +50,19 @@
           reg_i[r2] = v1 % v2; \
         }
 
-#define HANDLE_NEG  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] = -reg_i[r1]; \
-        }
+#define HANDLE_NEG  _HANDLE_OP_1REG_INT(reg_i[r1] = -reg_i[r1])
 
-#define HANDLE_ADDF  {\
+#define _HANDLE_OP_2REGS_FLOAT(statement)  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
           r2 = LO_NIBBLE(instrBuffer[1]); \
           CHECK_INVALID_REGSF(r1, r2); \
-          reg_f[r1] += reg_f[r2]; \
+          statement; \
         }
 
-#define HANDLE_SUBF  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REGSF(r1, r2); \
-          reg_f[r1] -= reg_f[r2]; \
-        }
-
-#define HANDLE_MULF  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REGSF(r1, r2); \
-          reg_f[r1] *= reg_f[r2]; \
-        }
-
-#define HANDLE_DIVF  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REGSF(r1, r2); \
-          reg_f[r1] /= reg_f[r2]; \
-        }
+#define HANDLE_ADDF  _HANDLE_OP_2REGS_FLOAT(reg_f[r1] += reg_f[r2])
+#define HANDLE_SUBF  _HANDLE_OP_2REGS_FLOAT(reg_f[r1] -= reg_f[r2])
+#define HANDLE_MULF  _HANDLE_OP_2REGS_FLOAT(reg_f[r1] *= reg_f[r2])
+#define HANDLE_DIVF  _HANDLE_OP_2REGS_FLOAT(reg_f[r1] /= reg_f[r2])
 
 #define HANDLE_NEGF  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -102,12 +70,7 @@
           reg_f[r1] = -reg_f[r1]; \
         }
 
-#define HANDLE_AND  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] &= reg_i[r2]; \
-        }
+#define HANDLE_AND  _HANDLE_OP_2REGS_INT(reg_i[r1] &= reg_i[r2])
 
 #define HANDLE_ANDI  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -115,12 +78,7 @@
           reg_i[r1] &= (int)bytesToInt16(&instrBuffer[2]); \
         }
 
-#define HANDLE_OR  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] |= reg_i[r2]; \
-        }
+#define HANDLE_OR  _HANDLE_OP_2REGS_INT(reg_i[r1] |= reg_i[r2])
 
 #define HANDLE_ORI  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -128,12 +86,7 @@
           reg_i[r1] |= (int)bytesToInt16(&instrBuffer[2]); \
         }
 
-#define HANDLE_XOR  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] ^= reg_i[r2]; \
-        }
+#define HANDLE_XOR  _HANDLE_OP_2REGS_INT(reg_i[r1] ^= reg_i[r2])
 
 #define HANDLE_XORI  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -141,11 +94,7 @@
           reg_i[r1] ^= (int)bytesToInt16(&instrBuffer[2]); \
         }
 
-#define HANDLE_NOT  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          reg_i[r1] = !reg_i[r1]; \
-        }
+#define HANDLE_NOT  _HANDLE_OP_1REG_INT(reg_i[r1] = !reg_i[r1])
 
 #define HANDLE_SHL  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -303,7 +252,7 @@
 
 /*conditional jumps*/
 
-#define HANDLE_CONDITIONAL_JUMP(cond, descr)  {\
+#define _HANDLE_CONDITIONAL_JUMP(cond, descr)  {\
           Int16 offset = bytesToInt16(&instrBuffer[2]); \
           if (cond) { \
             DBG("%s to %d", descr, IP+(int)offset); \
@@ -311,17 +260,12 @@
           } \
         }
 
-#define HANDLE_JE    HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_EQ, "JE")
-
-#define HANDLE_JNE   HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_LT || FLAGS == FLAG_GT, "JNE")
-
-#define HANDLE_JL    HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_LT, "JL")
-
-#define HANDLE_JLE   HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_LT || FLAGS == FLAG_EQ, "JLE")
-
-#define HANDLE_JG    HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_GT, "JG")
-
-#define HANDLE_JGE   HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_GT || FLAGS == FLAG_EQ, "JGE")
+#define HANDLE_JE    _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_EQ, "JE")
+#define HANDLE_JNE   _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_LT || FLAGS == FLAG_GT, "JNE")
+#define HANDLE_JL    _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_LT, "JL")
+#define HANDLE_JLE   _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_LT || FLAGS == FLAG_EQ, "JLE")
+#define HANDLE_JG    _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_GT, "JG")
+#define HANDLE_JGE   _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_GT || FLAGS == FLAG_EQ, "JGE")
 
 
 /*Interrupt: immediate contains interrupt number and IR contains function number on low halfword
