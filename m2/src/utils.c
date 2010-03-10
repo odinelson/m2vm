@@ -138,11 +138,11 @@ void showFloatRegisters() {
 void dumpRAM(int start, int end, int as_words) {
   int i;
   if (as_words) {  /*mostra a RAM como Words (32 bits)*/
-     for (i = start; i < end; i+=WORD_SIZE)
+     for (i = start; i <= end; i+=WORD_SIZE)
        printf("[%08X]\t%10d  (dec);\t%04X  (hex)\n", i, bytesToInt16(&ram[i]), bytesToInt16(&ram[i]));
   }
   else {
-    for (i = start; i < end; i++)
+    for (i = start; i <= end; i++)
       printf("[%08X]\t%3d  (dec);\t%02X  (hex);\t%s  (ascii)\n", i, ram[i], ram[i], asAscii(ram[i]));
   }
   printf("\n");
