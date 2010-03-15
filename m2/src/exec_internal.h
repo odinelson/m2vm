@@ -12,6 +12,10 @@
 
 #define HANDLE_HALT  { finished = 1; }
 
+/* NOTE: The macros with an underscore (_HANDLE_SOMETHING) are helpers,
+ * to avoid writing repeated code, here possible.
+ */
+
 #define _HANDLE_OP_1REG_INT(statement)  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
           CHECK_INVALID_REG_DESTINATION(r1); \
@@ -172,24 +176,17 @@
           DBG("CMP: F%d=%f; F%d=%f  ;  FLAGS=%d", r1, reg_f[r1], r2, reg_f[r2], FLAGS); \
         }
 
-/*Indexed LOD R,*(R+signed_offset)*/
-#define HANDLE_LOD  {\
+#define _HANDLE_LODSTOR_INT(statement)  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
           r2 = LO_NIBBLE(instrBuffer[1]); \
           CHECK_INVALID_REG_DESTINATION(r1); \
           Int16 offset = bytesToInt16(&instrBuffer[2]); \
-          reg_i[r1] = bytesToInt32(&ram[reg_i[r2]+offset]); \
-          DBG("LOD : R%d=%d; R%d=%d; offset=%d", r1, reg_i[r1], r2, reg_i[r2], offset); \
+          statement; \
         }
 
-#define HANDLE_LODB  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          CHECK_INVALID_REG_DESTINATION(r1); \
-          Int16 offset = bytesToInt16(&instrBuffer[2]); \
-          reg_i[r1] = (int)ram[reg_i[r2]+offset]; \
-          DBG("LODB : R%d=%d; R%d=%d; offset=%d", r1, reg_i[r1], r2, reg_i[r2], offset); \
-        }
+/*Indexed LOD R,*(R+signed_offset)*/
+#define HANDLE_LOD   _HANDLE_LODSTOR_INT(reg_i[r1] = bytesToInt32(&ram[reg_i[r2]+offset]))
+#define HANDLE_LODB  _HANDLE_LODSTOR_INT(reg_i[r1] = (int)ram[reg_i[r2]+offset])
 
 #define HANDLE_LODF  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -216,21 +213,8 @@
         }
 
 /*Indexed STOR *(R+offset),R*/
-#define HANDLE_STOR  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          Int16 offset = bytesToInt16(&instrBuffer[2]); \
-          int32ToBytes(reg_i[r2], &ram[reg_i[r1]+offset]); \
-          DBG("STOR : R%d=%d; offset=%d; R%d=%d", r1, reg_i[r1], offset, r2, reg_i[r2]); \
-        }
-
-#define HANDLE_STORB  {\
-          r1 = HI_NIBBLE(instrBuffer[1]); \
-          r2 = LO_NIBBLE(instrBuffer[1]); \
-          Int16 offset = bytesToInt16(&instrBuffer[2]); \
-          ram[reg_i[r1]+offset] = (Byte)reg_i[r2]; \
-          DBG("STORB : R%d=%d; offset=%d; R%d=%d", r1, reg_i[r1], offset, r2, reg_i[r2]); \
-        }
+#define HANDLE_STOR  _HANDLE_LODSTOR_INT(int32ToBytes(reg_i[r2], &ram[reg_i[r1]+offset]))
+#define HANDLE_STORB  _HANDLE_LODSTOR_INT(ram[reg_i[r1]+offset] = (Byte)reg_i[r2])
 
 #define HANDLE_STORF  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -268,8 +252,7 @@
 #define HANDLE_JGE   _HANDLE_CONDITIONAL_JUMP(FLAGS == FLAG_GT || FLAGS == FLAG_EQ, "JGE")
 
 
-/*Interrupt: immediate contains interrupt number and IR contains function number on low halfword
-  TODO: error code mechanism?*/
+/*Interrupt: immediate contains interrupt number and IR contains function number on low halfword*/
 #define HANDLE_INT  {\
           Int16 int_num = bytesToInt16(&instrBuffer[2]); \
           Int16 func_num = LO_HALFWORD(IR); \
