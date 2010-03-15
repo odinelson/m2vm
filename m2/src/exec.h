@@ -47,13 +47,14 @@ extern Real32 reg_f[16];
 #define F5   reg_f[5]
 
 
+#define FLAG_EQ  0x00
 #define FLAG_LT  0x01
 #define FLAG_GT  0x02
-#define FLAG_EQ  0x04
+/* Invalid input from interrupt, for example*/
+#define FLAG_INVALID  -1
 
 /*NOTA: <=, >= e <> são armazenados em combinações dos flags acima:
-FLAG_LT e FLAG_GT setados significa <>, por exemplo.
-O HI_BYTE(HI_HALFWORD(FLAGS)) por enquanto não é usado; pode ser usado para um flag adicional futuro*/
+FLAG_LT e FLAG_GT setados significa <>, por exemplo.*/
 
 #define CHECK_STACK_OVERFLOW   if (SP < ST) { fprintf(stderr, "Stack Overflow!"); exit(-2); }
 #define CHECK_STACK_UNDERFLOW  if (SP > SB) { fprintf(stderr, "Stack Underflow!"); exit(-2); }

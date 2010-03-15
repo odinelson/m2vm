@@ -28,18 +28,44 @@ int getMilliCount() {
 
 Int32 readInt() {
   Int32 i;
+  char buff[31];
+  char* err_ptr;
   fflush(stdout);
-  scanf("%d", &i);
-  FLUSH_INPUT_BUFFER;
-  return i;
+  if (readStr(buff, 30)) {
+	  i = strtol(buff, &err_ptr, 10);
+	  if (buff[0] != '\n' && (*err_ptr == '\n' || *err_ptr == '\0')) {
+		  FLAGS = FLAG_EQ;
+		  return i;
+	  } else {
+		  FLAGS = FLAG_INVALID;
+		  return 0;
+	  }
+  }
+  else {
+    FLAGS = FLAG_INVALID;
+  	return 0;
+  }
 }
 
 Real32 readFloat() {
   Real32 f;
+  char buff[31];
+  char* err_ptr;
   fflush(stdout);
-  scanf("%f", &f);
-  FLUSH_INPUT_BUFFER;
-  return f;
+  if (readStr(buff, 30)) {
+	  f = (Real32) strtod(buff, &err_ptr);
+	  if (buff[0] != '\n' && (*err_ptr == '\n' || *err_ptr == '\0')) {
+		  FLAGS = FLAG_EQ;
+		  return f;
+	  } else {
+		  FLAGS = FLAG_INVALID;
+		  return 0;
+	  }
+  }
+  else {
+    FLAGS = FLAG_INVALID;
+  	return 0;
+  }
 }
 
 Int32 readChar() {
