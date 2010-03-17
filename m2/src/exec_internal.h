@@ -176,7 +176,7 @@
           DBG("CMP: F%d=%f; F%d=%f  ;  FLAGS=%d", r1, reg_f[r1], r2, reg_f[r2], FLAGS); \
         }
 
-#define _HANDLE_LODSTOR_INT(statement)  {\
+#define _HANDLE_LOD_INT(statement)  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
           r2 = LO_NIBBLE(instrBuffer[1]); \
           CHECK_INVALID_REG_DESTINATION(r1); \
@@ -185,8 +185,8 @@
         }
 
 /*Indexed LOD R,*(R+signed_offset)*/
-#define HANDLE_LOD   _HANDLE_LODSTOR_INT(reg_i[r1] = bytesToInt32(&ram[reg_i[r2]+offset]))
-#define HANDLE_LODB  _HANDLE_LODSTOR_INT(reg_i[r1] = (int)ram[reg_i[r2]+offset])
+#define HANDLE_LOD   _HANDLE_LOD_INT(reg_i[r1] = bytesToInt32(&ram[reg_i[r2]+offset]))
+#define HANDLE_LODB  _HANDLE_LOD_INT(reg_i[r1] = (int)ram[reg_i[r2]+offset])
 
 #define HANDLE_LODF  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -212,9 +212,16 @@
           DBG("F%d=%f", r1, reg_f[r1]); \
         }
 
+#define _HANDLE_STOR_INT(statement)  {\
+          r1 = HI_NIBBLE(instrBuffer[1]); \
+          r2 = LO_NIBBLE(instrBuffer[1]); \
+          Int16 offset = bytesToInt16(&instrBuffer[2]); \
+          statement; \
+        }
+
 /*Indexed STOR *(R+offset),R*/
-#define HANDLE_STOR  _HANDLE_LODSTOR_INT(int32ToBytes(reg_i[r2], &ram[reg_i[r1]+offset]))
-#define HANDLE_STORB  _HANDLE_LODSTOR_INT(ram[reg_i[r1]+offset] = (Byte)reg_i[r2])
+#define HANDLE_STOR  _HANDLE_STOR_INT(int32ToBytes(reg_i[r2], &ram[reg_i[r1]+offset]))
+#define HANDLE_STORB  _HANDLE_STOR_INT(ram[reg_i[r1]+offset] = (Byte)reg_i[r2])
 
 #define HANDLE_STORF  {\
           r1 = HI_NIBBLE(instrBuffer[1]); \
@@ -322,4 +329,3 @@
         }
 
 #endif /*EXEC_INTERNAL_H*/
-
