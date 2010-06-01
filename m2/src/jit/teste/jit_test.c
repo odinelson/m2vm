@@ -29,6 +29,7 @@
 /*
  * Estrutura que representa os dados de um buffer do JIT
  */
+
 typedef struct JitBuffer {
 	int idx;
 	int size;
@@ -98,6 +99,7 @@ void genRET(JitBuffer* buffer){
 	emitByte(buffer, 0xC3);
 }
 
+//OK
 void genMOV_REG_IMM(int reg, int imm, JitBuffer* buffer){
 
 	Byte bytes[4];
@@ -127,22 +129,28 @@ void genADD_REG_IMM(int reg, int imm, JitBuffer* buffer){
 	emitByte(buffer, bytes[3]);
 
 }
-//PROBLEMA
-void genADD_REG_REG(int reg1, int reg2, JitBuffer* buffer){
+//OK
+void genADD_REG(int reg1, int reg2, JitBuffer* buffer){
 
-	unsigned char modrm = reg1 | reg2;
+	unsigned char modrm = (0xc0 + reg1) | (0xc0 + reg2);
 
 	emitByte(buffer, 0x03);
 	emitByte(buffer, modrm);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
 
 }
 
+//OK
+void genSUB_REG(int reg1, int reg2, JitBuffer* buffer){
 
+	unsigned char modrm = (0xc0 + reg1) | (0xc0 + reg2);
 
+	/*	MOV reg, reg */
+	emitByte(buffer, 0x2B);
+	emitByte(buffer, modrm);
+
+}
+
+//OK
 void genSUB_REG_IMM(int reg, int imm, JitBuffer* buffer){
 
 	Byte bytes[4];
@@ -162,64 +170,83 @@ void genSUB_REG_IMM(int reg, int imm, JitBuffer* buffer){
 
 }
 
-void genIDIV(int reg, JitBuffer* buffer){
+void genIDIV_REG(JitBuffer* buffer){
 
-	unsigned char modrm = (0xc0 + reg) | 0x38;
+	unsigned char modrm = (0xc0 + R_EAX)| (0xc0 + R_EDX) | 0x38;
 
 /*	DIV reg */
 	emitByte(buffer, 0xF7);
 	emitByte(buffer, modrm);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-
 }
 
+//ok
 void genIMUL_REG_IMM(int reg, int imm, JitBuffer* buffer){
 
 	Byte bytes[4];
 	int32ToBytes(imm,bytes);
 
+	unsigned char modrm = (0xc0 + reg);
 
 	emitByte(buffer, 0x69);
-	emitByte(buffer, reg);
+	emitByte(buffer, modrm);
 	emitByte(buffer, bytes[0]);
 	emitByte(buffer, bytes[1]);
 	emitByte(buffer, bytes[2]);
 	emitByte(buffer, bytes[3]);
 }
 
-void genIMUL(int reg, JitBuffer* buffer){
+void genIMUL_REG(int reg1, int reg2, JitBuffer* buffer){
 
-	unsigned char modrm = (0xc0 + reg) | 0x69;
+	unsigned char modrm = (0xc0 + reg1)|(0xc0 + reg2);
 
 /*	MUL reg */
-	emitByte(buffer, 0xf7);
+	emitByte(buffer, 0x0F);
 	emitByte(buffer, modrm);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
-	emitByte(buffer, 0x00);
 }
 
 int main(void) {
 
 	JitBuffer* code = allocBuffer(4096);
 
-	//Teste ADD
+	//Teste ADD OK
 //	genMOV_REG_IMM(R_EAX, 10,code);
 //	genADD_REG_IMM(R_EAX,10,code);
 //	genRET(code);
 
-//	//Testando SUB
+	//Teste ADD OK
+//	genMOV_REG_IMM(R_EAX, 10,code);
+//	genMOV_REG_IMM(R_ECX, 30,code);
+//	genADD_REG(R_EAX,R_ECX,code);
+//	genRET(code);
+
+
+//	//Testando SUB OK
 //	genMOV_REG_IMM(R_EAX, 70, code);
 //	genSUB_REG_IMM(R_EAX, 8, code);
 //	genRET(code);
 
-	//Testando IMUL
+//	//Testando SUB OK
+//	genMOV_REG_IMM(R_EAX, 70, code);
+//	genMOV_REG_IMM(R_ECX, 19, code);
+//	genSUB_REG(R_EAX, R_ECX, code);
+//	genRET(code);
+
+	//Testando IDIV falhou
+//	genMOV_REG_IMM(R_EAX, 10, code);
+//	genMOV_REG_IMM(R_EDX, 20, code);
+//	genIDIV_REG(code);
+//	genRET(code);
+
+
+	//Testando IMUL OK
+//	genMOV_REG_IMM(R_EAX, 10, code);
+//	genIMUL_REG_IMM(R_EAX,100, code);
+//	genRET(code);
+
+	//Testando IMUL OK
 	genMOV_REG_IMM(R_EAX, 10, code);
-	genIMUL_REG_IMM(R_EAX,10, code);
+	genMOV_REG_IMM(R_ECX,100, code);
+	genIMUL_REG(R_EAX, R_ECX, code);
 	genRET(code);
 
 
