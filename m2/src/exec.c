@@ -13,9 +13,11 @@
 #include "exec.h"
 #include "exec_interrupt.h"
 #include "exec_internal.h"
+#include "m2jit.h"
 
 Int32 reg_i[16];
 Real32 reg_f[16];
+JitBuffer* code;
 
 static void showBanner() {  /*if running in debug mode...*/
   printf("\nM2 Virtual Machine version %d.%d\nby Odilon Nelson <odilon.nelson@gmail.com>\n", M2_VERSION_MAJOR, M2_VERSION_MINOR);
@@ -26,6 +28,7 @@ void execM2() {
   Byte r1, r2;  /*registers referenced by instruction*/
   int finished = 0;
   IP = 0;       /*Instruction Pointer*/
+  code = allocBuffer(4096);
 
   if (MODE == STATUS_DEBUG)
     showBanner();
@@ -50,7 +53,9 @@ void execM2() {
       case HALT: HANDLE_HALT break;
       case INC: HANDLE_INC break;
       case DEC: HANDLE_DEC break;
-      case ADD: HANDLE_ADD break;
+      case ADD: genADD_2REG(code, reg_i[r1],reg_i[r2]);
+				reg_i[r1] = execBuffer(code);
+				break;
       case ADDI: HANDLE_ADDI break;
       case SUB: HANDLE_SUB break;
       case MUL: HANDLE_MUL break;
