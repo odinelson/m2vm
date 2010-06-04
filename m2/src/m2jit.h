@@ -64,6 +64,7 @@ void genADD_REG_IMM(JitBuffer* buffer, int reg, int imm);
 void genADD_2REG(JitBuffer* buffer, int reg1, int reg2);
 void genSUB_2REG(JitBuffer* buffer, int reg1, int reg2);
 void genSUB_REG_IMM(JitBuffer* buffer, int reg, int imm);
+void genIMUL_REG_IMM(JitBuffer* buffer, int reg, int imm);
 
 //Auxiliares
 void genRET(JitBuffer* buffer);
