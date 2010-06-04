@@ -156,62 +156,9 @@ void genIMUL_2REG(JitBuffer* buffer, int reg1, int reg2){
 	emitByte(buffer, modrm);
 }
 
-int main(void) {
+int execBuffer(JitBuffer* buffer){
 
-	JitBuffer* code = allocBuffer(4096);
+	t_function func = (t_function)buffer->contents;
+	return func();
 
-	//Teste ADD OK
-	genMOV_REG_IMM(code, R_EAX, 10);
-	genADD_REG_IMM(code, R_EAX, 10);
-	genRET(code);
-
-	//Teste ADD OK
-//	genMOV_REG_IMM(R_EAX, 10,code);
-//	genMOV_REG_IMM(R_ECX, 30,code);
-//	genADD_2REG(R_EAX,R_ECX,code);
-//	genRET(code);
-
-
-//	//Testando SUB OK
-//	genMOV_REG_IMM(R_EAX, 70, code);
-//	genSUB_REG_IMM(R_EAX, 8, code);
-//	genRET(code);
-
-//	//Testando SUB OK
-//	genMOV_REG_IMM(R_EAX, 70, code);
-//	genMOV_REG_IMM(R_ECX, 19, code);
-//	genSUB_2REG(R_EAX, R_ECX, code);
-//	genRET(code);
-
-	//Testando IDIV falhou
-//	genMOV_REG_IMM(R_EAX, 10, code);
-//	genMOV_REG_IMM(R_EDX, 20, code);
-//	genIDIV_2REG(code);
-//	genRET(code);
-
-
-	//Testando IMUL OK
-//	genMOV_REG_IMM(R_EAX, 10, code);
-//	genIMUL_REG_IMM(R_EAX,100, code);
-//	genRET(code);
-
-	//Testando IMUL
-//	genMOV_REG_IMM(R_EAX, 10, code);
-//	genMOV_REG_IMM(R_ECX,100, code);
-//	genIMUL_2REG(R_EAX, R_ECX, code);
-//	genRET(code);
-
-
-
-	/*
-	 * Obtém o conteúdo do buffer, fazendo typecast para ponteiro de função,
-	 * e executa o mesmo, descartando em seguida.
-	 */
-
-	t_function func = (t_function)code->contents;
-	int result = func();
-	destroyBuffer(&code);
-
-	printf("Resultado: %d\n", result);  /* resultado esperado: 10 */
-	return 0;
 }
