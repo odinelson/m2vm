@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "utils.h"
 #include "exec.h"
@@ -24,7 +25,18 @@ int main(int argc, char *argv[]) {
       MODE = STATUS_DEBUG;
     }
     if (ok) {
+      prepareM2JIT();
+#ifdef TIMING
+      clock_t start_clock = 0, end_clock = 0;
+      double elapsed = 0;
+      start_clock = clock();
+#endif
       execM2();
+#ifdef TIMING
+      end_clock = clock();
+      elapsed = ((double)(end_clock - start_clock))/CLOCKS_PER_SEC;
+      printf("\nexecution time: %g\n", elapsed);
+#endif
     }
     else { fprintf(stderr, "Cannot open \"%s\".\n", argv[0]); exit(-1); }
   }

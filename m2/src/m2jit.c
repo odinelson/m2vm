@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <windows.h>
 #include "m2jit.h"
+// FIXME windows.h defines an 'INT' symbol... cannot use opcodes.h
+///#include "opcodes.h"
 #include "utils.h"
 
 
@@ -39,6 +41,11 @@ void destroyBuffer(JitBuffer** buffer) {
 	buffer = NULL;
 }
 
+int isJittable(unsigned char op) {
+	///return op >= INC && op <= DIV;
+	// FIXME windows.h defines an 'INT' symbol... cannot use opcodes.h
+	return op >= 0x02 && op <= 0x08;
+}
 
 void emitByte(JitBuffer* buffer, unsigned char byte) {
 	buffer->contents[buffer->idx++] = byte;

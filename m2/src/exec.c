@@ -17,10 +17,41 @@
 
 Int32 reg_i[16];
 Real32 reg_f[16];
-JitBuffer* code;
+JitBuffer* jit_code;
 
 static void showBanner() {  /*if running in debug mode...*/
   printf("\nM2 Virtual Machine version %d.%d\nby Odilon Nelson <odilon.nelson@gmail.com>\n", M2_VERSION_MAJOR, M2_VERSION_MINOR);
+}
+
+/*
+ * Just a test, by now
+ */
+void prepareM2JIT() {
+  Byte instrBuffer[WORD_SIZE];  /*holds current instruction to decode*/
+  int finished = 0;
+  int jit_interval_start=-1, jit_interval_end=-1;
+  IP = 0;       /*Instruction Pointer*/
+  ///jit_code = allocBuffer(4096);
+
+  while (!finished) {
+    /*fetches instruction from RAM*/
+    memcpy(instrBuffer, ram+IP, WORD_SIZE);
+    if (instrBuffer[0] == HALT)
+       finished = 1;
+    /*analyze bytecode*/
+    if (isJittable(instrBuffer[0])) {  /*opcode*/
+      printf("Jittable instruction at [%08X] (decimal: [%d]\n", IP, IP);
+      if (jit_interval_start == -1)
+    	  jit_interval_start = IP;
+      if (jit_interval_start != -1 && IP - jit_interval_start > 4) {
+    	  jit_interval_end = IP;
+      }
+    }
+    /*Note that all instructions are the same size, so we can increment IP here*/
+    IP += WORD_SIZE;
+  }
+  printf("*** JIT interval from [%08X] to [%08X]\n", jit_interval_start, jit_interval_end);
+  printf("*** JIT buffer size will be %d bytes\n", (jit_interval_end - jit_interval_start)*WORD_SIZE);  //multiply by ORD_SIZE to add some more room for generated instructions
 }
 
 void execM2() {
@@ -28,7 +59,7 @@ void execM2() {
   Byte r1, r2;  /*registers referenced by instruction*/
   int finished = 0;
   IP = 0;       /*Instruction Pointer*/
-  code = allocBuffer(4096);
+  ///jit_code = allocBuffer(4096);
 
   if (MODE == STATUS_DEBUG)
     showBanner();
@@ -53,9 +84,9 @@ void execM2() {
       case HALT: HANDLE_HALT break;
       case INC: HANDLE_INC break;
       case DEC: HANDLE_DEC break;
-      case ADD: genADD_2REG(code, reg_i[r1],reg_i[r2]);
-				reg_i[r1] = execBuffer(code);
-				break;
+      case ADD: HANDLE_ADD break;/*genADD_2REG(jit_code, reg_i[r1],reg_i[r2]);
+				reg_i[r1] = execBuffer(jit_code);
+				break;*/
       case ADDI: HANDLE_ADDI break;
       case SUB: HANDLE_SUB break;
       case MUL: HANDLE_MUL break;

@@ -1,3 +1,7 @@
+#ifndef M2JIT_H
+#define M2JIT_H
+
+
 /*Registradores*/
 #define R_EAX 0
 #define R_ECX 1
@@ -44,6 +48,11 @@ JitBuffer* allocBuffer(int size);
 void destroyBuffer(JitBuffer** buffer);
 
 /*
+ * Retorna 'true' se o opcode dado é considerado 'jitável'
+ */
+int isJittable(unsigned char op);
+
+/*
  * Acrescenta um byte ao buffer, incrementando seu contador.
  * Esta função pode ser usada como "tijolo" para a construção das funções de
  * geração de código JIT.
@@ -71,3 +80,4 @@ void genRET(JitBuffer* buffer);
 void genMOV_REG_IMM(JitBuffer* buffer, int reg, int imm);
 
 
+#endif /*M2JIT_H*/

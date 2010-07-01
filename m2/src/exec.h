@@ -67,6 +67,7 @@ typedef enum M2STATUS {
   STATUS_NORMAL, STATUS_DEBUG
 } M2Status;
 
+void prepareM2JIT();
 void execM2();
 void illegalOp(int ip);
 
