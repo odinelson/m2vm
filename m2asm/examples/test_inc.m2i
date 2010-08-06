@@ -1,0 +1,18 @@
+;
+; M2 Assembler Test File
+; Tests the %INCLUDE directive
+; @author Odilon
+;	
+	%DEF ch1 'A'
+	%DEF ch2 'L'
+	%DEF ch3 'O'
+	
+	%CODE
+	LOD	R0 , ch1
+	LOD	IR, 0		;write_char
+	INT	1
+	LOD	R0 , ch2
+	INT	1
+	LOD	R0 , ch3
+	INT	1
+

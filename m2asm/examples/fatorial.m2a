@@ -1,0 +1,57 @@
+;
+; M2 Assembler Test File
+; Implementa e testa uma funcao para calculo do fatorial
+; @author Odilon
+;	
+
+%CODE
+
+	LOD  R0, @PROMPT
+	CALL @READ_INT
+	PUSH R0			;passa R0 como parametro
+	CALL @FAT
+	LOD	 IR, 2
+	INT	 1
+	HALT
+
+; Expects: Address of prompt string in R0
+; Returns: int in R0
+@READ_INT:
+	LOD	IR, 6		;write_strz
+	INT	1
+	LOD	IR, 3		;read_int
+	INT	1
+	RET
+
+
+; Função: fatorial (recursivo)
+; Implementa o seguinte algoritmo (exemplo em C):
+;   int fat(int n) { return n <= 0 ? 1 : n * fat(n - 1); }
+; Entrada: n (na pilha)
+; Saída: fatorial de n (em R0)
+@FAT:
+	PUSH FP				;prólogo
+	CPY  FP, SP			;prólogo
+	
+	PUSH R1				;R1 é modificado, portanto o salvamos
+	LOD  R0, *(FP+8)	;obtém parâmetro
+	CMP  R0, 0
+	JG   @FAT.1
+	LOD  R0, 1
+	JMP  @FAT.2
+@FAT.1:
+	DEC  R0
+	PUSH R0				;recursão: fat(n-1)
+	CALL @FAT
+	LOD  R1, *(FP+8)
+	MUL  R0, R1
+@FAT.2:
+	POP  R1				;restaura R1
+	CPY  SP, FP			;epílogo
+	POP  FP				;epílogo
+	RET
+
+
+%DATA
+
+@PROMPT: DB "n? ", 0

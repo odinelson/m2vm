@@ -1,0 +1,9 @@
+#Wed Jun 02 04:31:04 GMT-03:00 2010
+CLEAR_CONSOLE=false
+JJ_NATURE=true
+JTB_OPTIONS=-p\=br.unipe.m2asm.parse
+RUNTIME_JJJAR=C\:/eclipse-java/plugins/sf.eclipse.javacc_1.5.19/javacc.jar
+RUNTIME_JTBJAR=C\:/eclipse-java/plugins/sf.eclipse.javacc_1.5.19/jtb-1.4.1.jar
+SHOW_CONSOLE=true
+SUPPRESS_WARNINGS=true
+eclipse.preferences.version=1

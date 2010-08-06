@@ -1,0 +1,22 @@
+;
+; M2 Assembler Test File
+; Integer arithmetic example
+; @author Odilon
+;	
+	
+%CODE
+	;read 1st int
+	LOD	IR, 3
+	INT	1
+	;inteiro lido está em R0. Copiar para R1 (pois vamos sobrescrever R0)
+	CPY	R1, R0
+	
+	;read 2nd int
+	LOD	IR, 3
+	INT	1
+	
+	;show their sum
+	ADD	R0, R1
+	LOD	IR, 2
+	INT	1
+	HALT

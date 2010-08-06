@@ -1,0 +1,91 @@
+;
+;  SLAP Language StdLib
+;  author: Odilon Nelson
+;
+
+%MACRO _STD_FUNCTION  funcNum
+	;PUSH IR
+	LOD IR, funcNum
+	INT 1
+	;POP IR
+	;RET
+%ENDMACRO _STD_FUNCTION
+
+
+%CODE
+; writes a char to stdout; preserves IR
+; input: char in R0
+@write_char:
+	_STD_FUNCTION  0
+	RET
+
+; reads a char from stdin; preserves IR
+; output: char in R0
+@read_char:
+	_STD_FUNCTION  1
+	RET
+
+; writes a newline char to stdout; preserves IR
+@write_nl:
+	LOD R0, 10
+	_STD_FUNCTION  0
+	RET
+
+; writes an int to stdout; preserves IR
+; input: int in R0
+@write_int:
+	_STD_FUNCTION  2
+	RET
+
+; reads an int from stdin; preserves IR
+; output: int in R0
+@read_int:
+	_STD_FUNCTION  3
+	JE 	@read_int@ok
+	;err msg & halt vm
+	LOD R0, @$MSG_INV
+	CALL @write_text
+	LOD R0, @$MSG_INT
+	CALL @write_text
+	CALL @write_nl
+	HALT
+@read_int@ok:
+	RET
+
+; writes a float to stdout; preserves IR
+; input: float in F0
+@write_float:
+	_STD_FUNCTION  4
+	JE 	@read_float@ok
+	;err msg & halt vm
+	LOD R0, @$MSG_INV
+	CALL @write_text
+	LOD R0, @$MSG_FLT
+	CALL @write_text
+	CALL @write_nl
+	HALT
+@read_float@ok:
+	RET
+
+; reads a float from stdin; preserves IR
+; output: float in F0
+@read_float:
+	_STD_FUNCTION  5
+	RET	
+
+; writes zero-terminated string to stdout; preserves IR
+; input: string address in R0
+@write_text:
+	_STD_FUNCTION  6
+	RET
+
+; reads a zero-terminated string from stdin; preserves IR
+; output: string address in R0
+@read_text:
+	_STD_FUNCTION  7
+	RET
+
+%DATA
+	@$MSG_INV: DB "Not a valid ",0
+	@$MSG_INT: DB "integer",0
+	@$MSG_FLT: DB "floating-point number",0

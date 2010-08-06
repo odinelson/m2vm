@@ -1,0 +1,23 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout, but using indirect addressing
+; This example tests the :BYTE modifier with labels...
+; @author Odilon
+;	
+	
+	%CODE
+	;LOD	R0 , *DT:BYTE
+	;LOD R0, @MSG:BYTE		;TODO: Add some logic to emit error message for this notation...
+	LOD R0, *@MSG:BYTE
+	LOD	IR, 0		;write_char
+	INT	1
+	;LOD	R0 , *(DT+1):BYTE
+	LOD R0, *@MSG1:BYTE	
+	INT	1
+	LOD	R0 , *(DT+2):BYTE
+	INT	1
+	HALT
+	
+	%DATA
+@MSG:	DB "Alo"
+@MSG1:	DB "L"

@@ -1,0 +1,63 @@
+%CODE
+	LOD R0, *large_int
+L1:
+	CMP  R0, 0
+	JLE  L2
+	;;CALL writeln_int
+	; makes R1 = 1, through a series of needlessly complex operations...
+	; in high-level:  R1 := 0; R1 := R1 * R1; R1 := R1 * R1; R1 := R1 + R1 + R1 + R1 + R1; R1 := R1 + 10; R1++; (repeated 11 times) R1--; (repeated 19 times)
+	LOD R1, 0
+	MUL R1, R1
+	MUL R1, R1
+	ADD R1, R1
+	ADD R1, R1
+	ADD R1, R1
+	ADD R1, R1
+	ADD R1, 10
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	INC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	DEC R1
+	; useful operation: R1 = 1, so this is equivalent to: DEC R0
+	SUB  R0, R1	
+	JMP  L1
+L2:
+	HALT
+
+writeln_int:
+	LOD  IR, 2
+	INT  1
+	PUSH R0
+	LOD  R0, 10
+	LOD  IR, 0
+	INT  1
+	POP  R0
+	RET
+
+%DATA
+large_int: DW 999999

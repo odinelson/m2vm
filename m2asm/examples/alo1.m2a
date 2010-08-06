@@ -1,0 +1,18 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout
+; @author Odilon
+;	
+	
+	%CODE
+	LOD	R0 , 'A'
+	LOD	IR, 0		;write_char
+	INT	1
+	LOD	R0 , 'l'
+	INT	1
+	LOD	R0 , 'o'
+	INT	1
+	LOD	R0 , 10		;'\n'
+	INT	1
+fim:	
+	HALT

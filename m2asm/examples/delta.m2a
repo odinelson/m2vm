@@ -1,0 +1,63 @@
+;
+; M2 Assembler Test File
+; Calculates the value of delta, in a 2nd degree equation
+; @author Odilon
+;	
+	
+		%CODE
+		;read a
+		CPY	R0, DT		;@PROMPT_A
+		LOD	IR, 6		;write_strz
+		INT	1
+		LOD	IR, 5		;read_float
+		INT	1
+		STOR *(DT+16), F0	;@A<-F0
+		
+		;read b
+		ADD	R0, 4		;@PROMPT_B
+		LOD	IR, 6		;write_strz
+		INT	1
+		LOD	IR, 5		;read_float
+		INT	1
+		STOR *(DT+20), F0	;@B<-F0
+		
+		;read c
+		ADD	R0, 4		;@PROMPT_C
+		LOD	IR, 6		;write_strz
+		INT	1
+		LOD	IR, 5		;read_float
+		INT	1
+		STOR *(DT+24), F0	;@C<-F0
+		
+		LOD	F0, *(DT+16)	;@A
+		LOD	F1, *(DT+20)	;@B
+		LOD	F2, *(DT+24)	;@C
+		
+		MUL	F1, F1		;b*b
+		;;LOD	F3, 4		;4*a	;BUG
+		LOD	F3, *@FOUR
+		;LOD	R0, 4
+		;CPY	F3, R0
+		MUL	F0, F3		;F0<-4*a
+		MUL	F0, F2		;F0<-4*a*c
+		SUB	F1, F0		;F1<-b*b-4*a*c
+		
+		;show result
+		CPY	F0, F1
+		LOD	IR, 4		;write_float
+		INT	1
+		
+		HALT
+
+		%DATA
+@PROMPT_A:	DB "a? "
+			DB	0
+@PROMPT_B:	DB "b? "
+			DB	0
+@PROMPT_C:	DB "c? "
+			DB	0
+@FOUR:		DW	4.0
+
+@A:			DW	0
+@B:			DW	0
+@C:			DW	0

@@ -1,0 +1,41 @@
+; SLAPplus output
+	
+%CODE
+	LOD R0, *x
+	ADD R0, R0
+	LOD R1, *y
+	SUB R0, R1
+	INC R0
+	STOR *x, R0
+	PUSH R0
+	CALL __write_int
+	PUSH R1
+	CALL __write_int
+	ADD R1, R1
+	PUSH R1
+	CALL __write_int
+	HALT
+
+__write_int:
+	PUSH FP
+	CPY  FP, SP
+
+	PUSH R0
+	LOD  R0, *(FP+8)
+	LOD IR, 2
+	INT 1
+	LOD IR, 0
+	LOD R0, 10
+	INT 1
+	POP R0
+
+	CPY SP, FP
+	POP FP
+	RET
+
+%DATA
+
+x:  DW  10
+y:  DW  5
+
+	

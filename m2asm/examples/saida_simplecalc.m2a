@@ -1,0 +1,19 @@
+%CODE
+	LOD R0, 10
+	STOR *@x, R0
+	LOD R0, *@x
+	ADD R0, 2
+	STOR *@y, R0
+	LOD R0, *@x
+	LOD R1, *@y
+	ADD R0, R1
+	ADD R0, 3
+	CALL @WRITE_INT
+	HALT
+
+%INCLUDE simplecalclib
+
+%DATA
+
+@x:  DW  0
+@y:  DW  0

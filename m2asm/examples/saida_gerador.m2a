@@ -1,0 +1,34 @@
+%CODE
+	CALL @start
+	HALT
+@write:
+	PUSH FP
+	CPY  FP, SP
+	LOD  R0, *(FP+8)
+	LOD IR, 2
+	INT 1
+	LOD R0, 10
+	LOD IR, 0
+	INT 1
+	CPY SP, FP
+	POP FP
+	RET
+@start:
+	LOD R0, 0
+	STOR *@i, R0
+@L1:
+	LOD R0, *@i
+	CMP R0, 10
+	JGE @L2
+	LOD R1, *@i
+	ADD R1, 1
+	STOR *@i, R1
+	LOD R2, *@i
+	PUSH R2
+	CALL @write
+	JMP @L1
+@L2:
+	RET	
+;end of start
+%DATA
+	@i: RESW 1

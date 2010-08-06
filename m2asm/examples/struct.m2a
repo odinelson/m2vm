@@ -1,0 +1,34 @@
+;
+; M2 Assembler Test File
+; struct implementation in assembly
+; @author Odilon
+;	
+		%CODE
+		LOD	R0, prompt1		    ;load the ADDRESS of the string...
+		LOD	IR, 6		        ;write_strz
+		INT	1
+		LOD	R0, pessoa.nome
+		LOD	IR, 7		        ;read_strz
+		INT	1
+		
+		LOD	R0, prompt2
+		LOD	IR, 6		        ;write_strz
+		INT	1
+		LOD	IR, 3		        ;read_int
+		INT	1
+		STOR *pessoa.idade, R0
+		;at this point, we can inspect the layout of struct in debugger...
+		
+		HALT
+
+		%DATA
+		
+		prompt1:       DB "nome?> ",0
+		prompt2:       DB "idade?> ",0
+		
+		;pessoa:
+		;pessoa.nome:  RESB 100
+		;pessoa.idade: RESW 1
+		pessoa.nome:  DB "aaaaaaaaaaa",0
+		pessoa.idade: DW 0
+

@@ -1,0 +1,20 @@
+%CODE
+	;lê o número
+	LOD	IR, 3
+	INT	1
+	;inteiro lido está em R0. Empilhar
+	PUSH	R0
+	;chama função
+	CALL	@DOBRO
+	;retorno em R0: exibe
+	LOD	IR, 2
+	INT	1
+	HALT
+@DOBRO:			;note que a declaração da função é apenas um label...
+	PUSH	FP		;prologo
+	CPY	FP, SP	;prologo
+	LOD	R0, *(FP+8)	;obtem valor do parametro
+	ADD	R0, R0	;calcula dobro
+	CPY	SP, FP	;epilogo
+	POP	FP		;epilogo
+	RET

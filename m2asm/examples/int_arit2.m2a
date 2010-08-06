@@ -1,0 +1,21 @@
+;
+; M2 Assembler Test File
+; Integer arithmetic example, reading params from data segment
+; @author Odilon
+;	
+	
+%CODE
+	;read 1st int
+	LOD	R0, *@N1
+	;read 2nd int
+	LOD	R1, *@N2
+	
+	;show their sum
+	ADD	R0, R1
+	LOD	IR, 2
+	INT	1
+	HALT
+%DATA
+
+@N1: DW 10
+@N2: DW 5

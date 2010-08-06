@@ -1,0 +1,30 @@
+%CODE
+	CALL @start
+	HALT
+@start:
+	PUSH FP
+	CPY  FP, SP
+	;allocate space for local vars
+	ADD  SP, -4
+	LOD R0, @$STR1
+	STOR *(FP-4), R0
+	LOD R0, @$STR2
+	PUSH R0
+	CALL @write_text
+	LOD R0, *(FP-4)
+	PUSH R0
+	CALL @write_text
+	LOD R0, @$STR3
+	PUSH R0
+	CALL @write_text
+	CALL @write_nl
+	CPY SP, FP
+	POP FP
+	RET	
+;end of start
+%INCLUDE stdlib
+
+%DATA
+	@$STR1: DB "Odilon",0
+	@$STR2: DB "Hello, ",0
+	@$STR3: DB "!",0

@@ -1,0 +1,251 @@
+/**
+ * Segunda versão do Assembler para M2, agora com JavaCC
+ * Esta versão trata corretamente as quebras de linha
+ * A intenção é que a gramática seja mínima, e certas verificações
+ * (por exemplo, o número/tipo de argumentos corretos para cada opcode)
+ * sejam feitas na Árvore de Sintaxe Abstrata. 
+ *
+ * @author Odilon
+ * TODO Finalizar
+ */options{  JDK_VERSION = "1.5";  STATIC = false;
+  NODE_CLASS = "M2AsmNode";
+  VISITOR = true;
+  MULTI = true;
+  VISITOR_RETURN_TYPE = "void";
+  VISITOR_DATA_TYPE = "br.unipe.m2asm.codegen.SymbolTable";}PARSER_BEGIN(M2AsmParser)package br.unipe.m2asm.parse;
+
+public class M2AsmParser {}PARSER_END(M2AsmParser)
+SKIP :
+{
+  " "
+| "\t"
+}
+TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    ( "-" )? < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >
+| < CHAR_LITERAL : "'" ~[] "'" >
+| < STR_LITERAL : "\"" (~["\""])* "\"" >
+// gambiarra meio feia, mas util:
+// um token newline é composto de um comentario opcional seguido de quebra de linha
+// isso possibilita tratar comentários como quebras de linha, e simplifica a gramática
+// o único problema dessa abordagem é que o montador falha se o programa terminar com um comentário
+// sem quebra de linha após... 
+| < NEWLINE: ( ";" (~[ "\n", "\r" ])* )? ["\r", "\n"] | "\r\n" | "\n\r" >}
+TOKEN : /* RESERVED WORDS */
+{
+  //  opcodes
+  < NOP : ("NOP" | "NOP") >  | < HALT : ("HALT" | "halt") >
+  |
+  < INC : ("INC" | "inc") >  | < DEC : ("DEC" | "dec") >
+  |
+  < ADD : ("ADD" | "add") >  | < SUB : ("SUB" | "sub") >
+  |
+  < MUL : ("MUL" | "mul") >  | < DIV : ("DIV" | "div") >
+  |
+  < NEG : ("NEG" | "neg") >
+  |
+  < AND : ("AND" | "and") >  | < OR : ("OR" | "or") >
+  |
+  < XOR : ("XOR" | "xor") >  | < NOT : ("NOT" | "not") >
+  |
+  < SHL : ("SHL" | "shl") >  | < SHR : ("SHR" | "shr") >
+  |
+  < CPY : ("CPY" | "cpy") >
+  |
+  < CMP : ("CMP" | "cmp") >
+  |
+  < LOD : ("LOD" | "lod") > | < STOR : ("STOR" | "stor") >
+  |
+  < JMP : ("JMP" | "jmp") > | < JE : ("JE" | "je") >
+  |
+  < JNE : ("JNE" | "jne") > | < JL : ("JL" | "jl") >
+  |
+  < JLE : ("JLE" | "jle") > | < JG : ("JG" | "jg") >
+  |
+  < JGE : ("JGE" | "jge") >
+  |
+  < INT : ("INT" | "int") >
+  |
+  < CALL : ("CALL" | "call") > | < RET : ("RET" | "ret") >
+  |
+  < PUSH : ("PUSH" | "push") > | < POP : ("POP" | "pop") >
+  |
+//directives
+  < CODESEG : ("%CODE" | "%code") >
+  |
+  < DATASEG : ("%DATA" | "%data") >
+  |
+  < STACKSEG : ("%STACK" | "%stack") >
+  |
+  < INCLUDE : ("%INCLUDE" | "%include") >
+  |
+  < DEF : ("%DEF" | "%def") >
+  |
+  < MACRO : ("%MACRO" | "%macro") >
+  |
+  < ENDMACRO : ("%ENDMACRO" | "%endmacro") >
+  |
+//pseudoinstructions
+  < DB : ("DB" | "db") >  | < DW : ("DW" | "dw") >
+  |
+  < RESB : ("RESB" | "resb") >  | < RESW : ("RESW" | "resw") > 
+  |
+  < BYTE : ("BYTE" | "byte") > 
+}
+TOKEN : /* IDENTIFIERS */{  < REG_INT : ( ("R" | "r") <DIGIT> ( <DIGIT> )? ) | <NAMED_REG> >
+  |
+  < REG_FLOAT : ("F" | "f") <DIGIT> ( <DIGIT> )? >
+  |
+  < IDENTIFIER :  <LETTER> ( <LETTER> | <DIGIT> )* >
+  | 
+  < #NAMED_REG : ("FR" | "fr" | "IR" | "ir" | "MR" | "mr" |
+                  "DT" | "dt" | "UD" | "ud" | "ST" | "st" |
+                  "SB" | "sb" | "SP" | "sp" | "FP" | "fp" | "IP" | "ip") >
+  |   < #LETTER : [ "_", ".", "a"-"z", "A"-"Z" ] >
+  |   < #DIGIT : [ "0"-"9" ] >}ASTProg Prog() : {}
+{
+			  (<NEWLINE>)*
+	  ((Include() | Def() | Macro()) (<NEWLINE>)* )*
+	  (Segment())+
+	  (StackDecl())?
+	  { return jjtThis; }
+}
+
+void Segment() : { Token t; }
+{
+	  ( t=<CODESEG> | t=<DATASEG> ) (<NEWLINE>)+
+	  { jjtThis.value = t.image.substring(1); }
+	  StmtList()
+}
+
+/*
+ * The stack segment is treated differently; in the executable format, it is
+ * a segment, but on the source, it is just the declaration of the stack size.
+*/
+void StackDecl() : {}
+{
+	  <STACKSEG>  ((<NEWLINE>)+)?
+	  DeclaratorNonInit() Integer() ((<NEWLINE>)+ | <EOF>)
+}
+
+void StmtList() #void : {}
+{
+	  ( ( Label() (<NEWLINE>)* )? ( Stmt() | PseudoStmt() | Include() ) ((<NEWLINE>)+ | <EOF>) )*
+}
+void Stmt() : {}{  Opcode() ( Arg() ( "," Arg() )? )?
+}
+void PseudoStmt() : {}
+{
+  Declarator() Values()
+  |
+  DeclaratorNonInit() Integer()
+}
+
+void Include() : {}
+{
+  <INCLUDE> Str()
+}
+
+void Def() : {}
+{
+  <DEF> Id() Value()
+}
+
+void Macro() : { Token t; }
+{
+	  <MACRO> Id()
+	  StmtList()
+	  <ENDMACRO> Id()
+}
+void Opcode() : { Token t; }
+{
+  ( t=<NOP> | t=<HALT> |
+    t=<INC> | t=<DEC> | t=<ADD> | t=<SUB> | t=<MUL> | t=<DIV> | t=<NEG> |
+    t=<AND> | t=<OR> | t=<XOR> | t=<NOT> |
+    t=<SHL> | t=<SHR> |
+    t=<CPY> | t=<CMP> | t=<LOD> | t=<STOR> |
+    t=<JMP> | t=<JE> | t=<JNE> | t=<JL> | t=<JLE> | t=<JG> | t=<JGE> |
+    t=<INT> | t=<CALL> | t=<RET> |
+    t=<PUSH> | t=<POP>
+  )  
+  { jjtThis.value = t.image.toUpperCase(); }}
+
+void Arg() #void : {}
+{
+  Id() | Integer() | RegInt() | RegFloat() | Char() | MemRef()
+}
+
+void Declarator() : { Token t; }
+{
+	  ( t=<DB> | t=<DW> )
+	  { jjtThis.value = t.image.toUpperCase(); }
+}
+
+void DeclaratorNonInit() : { Token t; }
+{
+	  ( t=<RESB> | t=<RESW> )
+	  { jjtThis.value = t.image.toUpperCase(); }
+}
+
+void Values() : {}
+{
+  Value() ( "," Value() )*
+}
+
+void Value() #void : {}
+{
+  Integer() | Char() | Str()
+}
+
+void Label() : { Token t; }
+{
+  t=< IDENTIFIER > ":"
+  { jjtThis.value = t.image; }
+}
+
+void Id() : { Token t; }{  t=< IDENTIFIER >
+  { jjtThis.value = t.image; }}void Integer() : {}{  jjtThis.value = <INTEGER_LITERAL>.image
+}
+
+void Char() : { Token t; }
+{
+  t=< CHAR_LITERAL >
+  { jjtThis.value = t.image; }
+}
+
+void Str() : { Token t; }
+{
+  t=< STR_LITERAL >
+  { jjtThis.value = t.image.substring(1, t.image.length()-1); }
+}
+
+void RegInt() : { Token t; }
+{
+  t=<REG_INT>
+  { jjtThis.value = t.image.toUpperCase(); }
+}
+
+void RegFloat() : { Token t; }
+{
+  t=<REG_FLOAT>
+  { jjtThis.value = t.image.toUpperCase(); }
+}
+
+void MemRef() : {}
+{
+  "*" (
+    ( RegInt() | "(" RegInt() ( MemOffset() )? ")" )
+    |
+    Id()
+  ) 
+  ( MemSize() )?
+}
+
+void MemOffset() : { Token t1, t2; }{
+  (t1="+" | t1="-") t2=<INTEGER_LITERAL>
+  // Integer.parseInt does not understand prefix "plus" sign...  
+  { jjtThis.value = t1.image.equals("-") ? t1.image + t2.image : t2.image; }}
+
+void MemSize() : { Token t; }
+{
+  ":" t=<BYTE>
+  { jjtThis.value = t.image.toUpperCase(); }
+}

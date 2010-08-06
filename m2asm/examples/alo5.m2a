@@ -1,0 +1,28 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout, using a function
+; @author Odilon
+;	
+	
+		%CODE
+		;CPY	R0, DT		;R0 <- start of data: position-independent
+		LOD R0, @S1
+		CALL @WRITESTR
+		;ADD R0, 5
+		LOD R0, @S2		
+		CALL @WRITESTR
+		HALT
+
+; Expects: strz address in R0
+; Returns: nothing
+@WRITESTR:
+		LOD	IR, 6		;write_strz
+		INT	1
+		RET		
+
+		%DATA
+@S1:	DB	"Alo"
+		DB	10
+		DB	0
+@S2:	DB	"Tchau"
+		DB	0

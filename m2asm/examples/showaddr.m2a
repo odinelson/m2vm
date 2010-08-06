@@ -1,0 +1,14 @@
+;
+; M2 Assembler Test File
+; Shows the address of the last instruction of code segment...
+; @author Odilon
+;	
+				
+		%CODE
+		LOD	R0, end_addr		;load the ADDRESS of the instruction
+		LOD	IR, 2		;write_int
+		INT	1
+		NOP
+		NOP
+	end_addr:
+		HALT

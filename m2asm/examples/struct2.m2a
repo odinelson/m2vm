@@ -1,0 +1,53 @@
+;
+; M2 Assembler Test File
+; struct implementation in assembly
+; this example allocates the struct on the stack
+;
+; @author Odilon
+;	
+%CODE
+	CALL start
+	HALT
+
+start:
+	;function prologue
+	PUSH FP
+	CPY  FP, SP
+	;allocate space for local struct
+	ADD  SP, -16
+	
+	;struct start address is (FP-16)
+	;first field (nome) is 12 bytes long,
+	;so second field (idade) starts at address (FP-4)
+	
+	;read pessoa.nome
+	LOD	R0, prompt1		    ;load the ADDRESS of the string...
+	LOD	IR, 6		        ;write_strz
+	INT	1
+	;;LOD	R0, pessoa.nome
+	CPY R0, FP
+	ADD R0, -16	
+	LOD	IR, 7		        ;read_strz
+	INT	1
+	
+	;read pessoa.idade
+	LOD	R0, prompt2
+	LOD	IR, 6		        ;write_strz
+	INT	1
+	LOD	IR, 3		        ;read_int
+	INT	1
+	;STOR *pessoa.idade, R0
+	CPY R1, FP
+	ADD R1, -4
+	STOR *R1, R0
+	
+	;at this point, we can inspect the layout of struct in debugger...
+	
+	;function epilogue
+	CPY SP, FP
+	POP FP
+	RET	
+
+%DATA
+	prompt1:  DB "nome?> ",0
+	prompt2:  DB "idade?> ",0

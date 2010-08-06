@@ -1,0 +1,74 @@
+%CODE
+	LOD R0, *large_int
+L1:
+	CMP  R0, 0
+	JLE  L2
+	CALL writeln_int
+	; a series of useless operations...	
+	ADD  R0, 3
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	LOD  R1, 2
+	MUL  R0, R1
+	DIV  R0, R1
+	LOD  R1, 2    ;DIV alters both arguments...
+	MUL  R0, R1
+	LOD  R1, 2
+	DIV  R0, R1
+	ADD  R0, 2
+	DEC  R0
+	DEC  R0
+	ADD  R0, 20
+	ADD  R0, -20
+	ADD  R0, 10
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	DEC  R0
+	ADD  R0, 10
+	ADD  R0, -10
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	INC  R0
+	DEC  R0
+	; useful operation
+	DEC  R0	
+	JMP  L1
+L2:
+	HALT
+
+writeln_int:
+	LOD  IR, 2
+	INT  1
+	PUSH R0
+	LOD  R0, 10
+	LOD  IR, 0
+	INT  1
+	POP  R0
+	RET
+
+%DATA
+large_int: DW 99999

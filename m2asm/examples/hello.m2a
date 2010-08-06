@@ -1,0 +1,17 @@
+%CODE
+	CALL @start
+	HALT
+@start:
+	PUSH FP
+	CPY  FP, SP
+	LOD R0, @$STR1
+	PUSH R0
+	CALL @write_text
+	CPY SP, FP
+	POP FP
+	RET	
+;end of start
+%INCLUDE stdlib
+
+%DATA
+	@$STR1: DB "Hello, World!",0

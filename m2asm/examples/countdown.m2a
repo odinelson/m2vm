@@ -1,0 +1,57 @@
+%CODE
+	CALL @start
+	HALT
+; < begin_function, countdown, _, _ >
+@countdown:
+	PUSH FP
+	CPY  FP, SP
+; < label, L1, _, _ >
+@L1:
+; < >, i, 0, $t1 >
+	LOD R0, *(FP+8)
+	CMP R0, 0
+; < goto_if_false, $t1, _, L2 >
+	JLE @L2
+; < param, "i = ", _, _ >
+	LOD R0, @$TEXT1
+; < call, write_text, _, _ >
+	CALL @write_text
+; < param, i, _, _ >
+	LOD R0, *(FP+8)
+; < call, write_int, _, _ >
+	CALL @write_int
+; < call, write_nl, _, _ >
+	CALL @write_nl
+; < -, i, 1, $t1 >
+	LOD R1, *(FP+8)
+	LOD R2, 1
+	SUB R1, R2
+; < :=, $t1, _, i >
+	STOR *(FP+8), R1
+; < goto, _, _, L1 >
+	JMP @L1
+; < label, L2, _, _ >
+@L2:
+; < end_function, countdown, _, _ >
+	CPY SP, FP
+	POP FP
+	RET	
+;end of countdown
+; < begin_function, start, _, _ >
+@start:
+	PUSH FP
+	CPY  FP, SP
+; < param, 5, _, _ >
+	LOD R1, 5
+	PUSH R1
+; < call, countdown, _, $t1 >
+	CALL @countdown
+; < end_function, start, _, _ >
+	CPY SP, FP
+	POP FP
+	RET	
+;end of start
+%INCLUDE stdlib
+
+%DATA
+	@$TEXT1: DB "i = ",0

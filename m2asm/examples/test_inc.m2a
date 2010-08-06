@@ -1,0 +1,12 @@
+;
+; M2 Assembler Test File
+; Tests the %INCLUDE directive
+; @author Odilon
+;	
+	
+	;%INCLUDE "test_inc.m2i"
+	%INCLUDE "examples/test_inc"		;same as above... m2i extension is assumed.
+	
+	%CODE
+	; the real program is in include file...
+	HALT

@@ -1,0 +1,28 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout, the simpler way: using the "write_strz" interrupt
+; @author Odilon
+;	
+	    ;%DATA
+		;msg:	DB "Alo",10,0
+				
+		%CODE
+		LOD	R0, msg		;load the ADDRESS of the string...
+		LOD	IR, 6		;write_strz
+		INT	1
+		HALT
+
+		%DATA
+		;DB 0,0,0,0,0,0,0,0,0,0
+		msg: DB "Alo",10	;'\n'
+		     DB 0
+		; TODO : checar a possibilidade (e viabilidade) de eliminar o conceito de
+		;        "dados não inicializados" da VM; neste caso, RESB e RESW funcionariam
+		;        emitindo bytes zerados no segmento de dados.
+		;        Vantagem: A arquitetura fica ainda mais simples de descrever
+		;        Desvantagem: Os buffers passariam a ocupar espaço no binário...
+		;        no entanto, para equilibrar (ou anular) a desvantagem, pode-se usar o
+		;        conceito de alocação dinâmica (HEAP).
+		buffer1: RESB 20
+		buffer2: RESB 100
+		buffer3: RESB 20

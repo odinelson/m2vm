@@ -1,0 +1,18 @@
+;
+; M2 Assembler Test File
+; Just tests JMP, to validate code generation
+; @author Odilon
+;	
+	    %CODE
+	    JMP  end
+		NOP
+		NOP
+		NOP
+		NOP
+	end:
+		HALT
+		
+		;if the jump is incorrecly assembled as absolute, control will fall here,
+		;giving 'Invalid opcode' error.		
+		%DATA
+		DB  99

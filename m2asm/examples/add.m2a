@@ -1,0 +1,17 @@
+;
+; M2 Assembler Test File
+; Just adds two numbers, defined in the data section.
+; @author Odilon
+;	
+	
+	%CODE
+		LOD	R0, *N1
+		LOD	R1, *N2
+		ADD R0, R1
+		LOD	IR, 2		;write_int
+		INT	1
+		HALT
+	%DATA
+N1:		DW  10
+N2:		DW  15
+			

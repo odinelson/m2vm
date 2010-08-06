@@ -1,0 +1,21 @@
+;
+; Biblioteca-padrão (parcial) da linguagem SimpleCalc
+; @author Odilon
+;
+%CODE
+
+;
+; Esta função implementa writeln(int)
+; Ou seja, escreve um inteiro seguido de '\n'
+;
+@WRITE_INT:
+	LOD IR, 2	;2 = write_int
+	INT 1
+	;write_char com R0 = '\n'
+	;nota: aqui salvamos (PUSH) e restauramos (POP) R0
+	PUSH R0
+	LOD IR, 0	;0 = write_char
+	LOD R0, 10  ;10 = ascii('\n')
+	INT 1
+	POP R0
+	RET

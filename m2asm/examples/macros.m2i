@@ -1,0 +1,28 @@
+%MACRO PUTCH
+	LOD	IR, 0		;write_char
+	INT	1
+%ENDMACRO PUTCH
+	
+%MACRO PUTCHAR ch		;one parameter
+	LOD	R0, ch
+	LOD	IR, 0		;write_char
+	INT	1
+%ENDMACRO PUTCHAR
+	
+%MACRO SWAP reg1, reg2		;two parameters
+	PUSH reg1
+	CPY  reg1, reg2
+	POP  reg2
+%ENDMACRO SWAP
+	
+%MACRO GETARG1
+	LOD	R0, *FP
+%ENDMACRO GETARG1
+	
+%MACRO GETARG2
+	LOD	R0, *(FP-4)
+%ENDMACRO GETARG2
+	
+%MACRO GETARG3
+	LOD	R0, *(FP-8)
+%ENDMACRO GETARG3

@@ -1,0 +1,55 @@
+;
+; M2 Assembler Test File
+; This file tries to test all the syntax...
+; @author Odilon
+;	
+	
+	%CODE
+@start:	LOD R0 , 1
+		LOD R1, 2
+		LOD R2, 0xffff
+		LOD R3, -987
+		LOD R3, 'A'
+		LOD R1 , *DT
+		LOD R1 , *DT:BYTE
+		LOD R2 , *(DT+4)
+		LOD R3, *@x
+		LOD R4 , *(DT-1)
+		LOD R5 , *(DT+1):BYTE
+		INC R5
+		LOD	R0, 1
+		CPY	R1, R0
+		CMP	R0, R1
+		JE	@jump
+		STOR *(DT+1):BYTE, R4
+		STOR *(DT+1), R4
+		ADD R0, R1
+		INT 3
+		PUSH R0
+		PUSH F0
+@jump:	ADD F1,F2
+		CPY F1,F0
+		CPY R0,F0
+		CPY F0,R0
+		NOP
+		NOP
+@end:	HALT	;this stops the VM
+; Tests a label alone in a line
+@postEnd:
+
+	%DATA
+@x:		DW	10
+@y:		DB	0xFF
+@z:		DB	0x00
+		DB	0
+@msg:
+		DB	"Alo"
+		DB	0	;strz
+@n:		DW	-1
+;@n1:	DW	?		;I do not like this syntax
+@n1:	RESW 1		;THIS is the supported syntax...
+@buff:	RESB 101
+
+	%STACK	0xff
+
+

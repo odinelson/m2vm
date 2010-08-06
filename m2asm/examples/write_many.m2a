@@ -1,0 +1,37 @@
+%CODE
+	CALL @start
+	HALT
+@start:
+	PUSH FP
+	CPY  FP, SP
+	;allocate space for local vars
+	ADD  SP, -4
+	LOD R0, 2
+	ADD R0, 2
+	STOR *(FP-4), R0
+	LOD R2, 2
+	LOD R1, *(FP-4)
+	MUL R1, R2
+	ADD R1, 1
+	LOD R0, 2
+	CALL @write_int
+	LOD R0, @$STR1
+	CALL @write_text
+	LOD R0, *(FP-4)
+	CALL @write_int
+	LOD R0, @$STR1
+	CALL @write_text
+	LOD R0, 6
+	CALL @write_int
+	LOD R0, @$STR1
+	CALL @write_text
+	CPY R0, R1
+	CALL @write_int
+	CPY SP, FP
+	POP FP
+	RET	
+;end of start
+%INCLUDE stdlib
+
+%DATA
+	@$STR1: DB " ",0

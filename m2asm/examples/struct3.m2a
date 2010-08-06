@@ -1,0 +1,128 @@
+;
+; M2 Assembler Test File
+; struct implementation in assembly
+; this example allocates the struct on the stack and passes to a function to fill it
+; TODO : debug , complete and correct
+;
+; @author Odilon
+;	
+%CODE
+	CALL start
+	HALT
+
+start:
+	;function prologue
+	PUSH FP
+	CPY  FP, SP
+	;allocate space for local struct
+	ADD  SP, -16
+	;struct start address is (FP-16)
+	;first field (nome) is 12 bytes long,
+	;so second field (idade) starts at address (FP-4)
+	
+	;pass the address of struct as 1st param
+	CPY	R0, FP
+	ADD R0, -16
+	PUSH R0
+	
+	;read name and pass as param
+	LOD	R0, prompt1		    ;load the ADDRESS of the string...
+	LOD	IR, 6		        ;write_strz
+	INT	1
+	LOD	IR, 7		        ;read_strz
+	INT	1
+	PUSH R0					;R0 contais the address of read string
+		
+	;read age and pass as param
+	LOD	R0, prompt2
+	LOD	IR, 6		        ;write_strz
+	INT	1
+	LOD	IR, 3		        ;read_int
+	INT	1
+	PUSH R0
+	
+	;the params are passed, now call the function
+	CALL fillStruct
+
+	;another function...
+	;pass the address of struct as 1st (and only) param
+	CPY	R0, FP
+	ADD R0, -16
+	PUSH R0
+	CALL displayStruct
+	
+	;function epilogue
+	CPY SP, FP
+	POP FP
+	RET	
+
+fillStruct:
+	;function prologue
+	PUSH FP
+	CPY  FP, SP
+	;address of struct is 1st param (FP+16), name to use is 2nd (FP+12) and age is 3rd (FP+8)
+		
+	;struct layout:
+	;first field (nome) at offset 0, 12 bytes long,  (text)
+	;second field (idade) at offset 12, 4 bytes long (word)
+	
+	;load struct address from param
+	LOD	R0, *(FP+16)
+
+	;fill pessoa.nome, using a loop with null sentinel
+	LOD	R1, *(FP+12)         ;get param
+.loop:
+	LOD R2, *R1:BYTE         ;curr char
+	CMP R2, 0
+	JE  .ok
+	STOR *R0:BYTE, R2        ;put char in struct
+	INC R1
+	INC R0
+	JMP .loop
+.ok:
+	LOD	R0, *(FP+16)         ;reload struct address from param, because we messed with its address
+	
+	;fill pessoa.idade
+	LOD	R1, *(FP+8)         ;get param
+	STOR *(R0+12), R1        ;store using offset of field, in the struct
+		
+	;at this point, we can inspect the layout of struct in debugger...
+	
+	;function epilogue
+	CPY SP, FP
+	POP FP
+	RET	
+
+displayStruct:
+	;function prologue
+	PUSH FP
+	CPY  FP, SP
+	;address of struct is 1st param (FP+8)
+
+	;struct layout:
+	;first field (nome) at offset 0, 12 bytes long,  (text)
+	;second field (idade) at offset 12, 4 bytes long (word)
+	
+	;load struct address from param
+	LOD	R0, *(FP+8)
+		
+	;display pessoa.nome
+	LOD	IR, 6		        ;write_strz
+	INT	1
+	
+	;display pessoa.idade
+	CPY R1, R0
+	LOD R0, *(R1+12)        ;offset of pessoa.idade
+	LOD	IR, 2		        ;write_int
+	INT	1
+	
+	;function epilogue
+	CPY SP, FP
+	POP FP
+	RET
+
+%DATA
+	prompt1:  DB "nome?> ",0
+	prompt2:  DB "idade?> ",0
+
+%STACK RESB 1024

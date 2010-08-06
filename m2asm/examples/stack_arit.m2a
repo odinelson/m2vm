@@ -1,0 +1,16 @@
+;
+; Aritmética e manipulação da pilha
+; @author Odilon
+;	
+	
+	%CODE
+	PUSH R0
+	PUSH R1
+	LOD	 R0, 1
+	LOD  R1, 2
+	ADD  R0, R1
+	LOD	 IR, 2		;write_int
+	INT	 1
+	POP  R1
+	POP  R0
+	HALT

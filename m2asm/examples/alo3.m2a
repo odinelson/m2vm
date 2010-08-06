@@ -1,0 +1,25 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout, but using indirect addressing and looping.
+; Also demonstrates simple %DEF macros.
+; @author Odilon
+;	
+	
+	%DEF	STD_WRITE_CHAR	0
+	%DEF	STD_IO			1
+	
+	%CODE
+			LOD	R1, MSG		;R1 <- start of data: the address of the label 
+LOOP:		LOD	R0, *R1:BYTE
+			CMP	R0, 0		;terminator
+			
+			JE	LOOP_END
+			LOD	IR, STD_WRITE_CHAR
+			INT	STD_IO
+			INC	R1
+			JMP	LOOP
+LOOP_END:	HALT
+
+	%DATA
+MSG:		DB "Alo", '!'
+			DB	10, 0	;'\n' & '\0'			

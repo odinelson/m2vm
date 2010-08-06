@@ -1,0 +1,30 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout, using a function
+; This version puts the function at the beggining of the code, just to test it.
+; @author Odilon
+;	
+	
+		%CODE
+		JMP @START
+
+; Expects: strz address in R0
+; Returns: nothing
+@WRITESTR:
+		LOD	IR, 6		;write_strz
+		INT	1
+		RET		
+
+@START:
+		CPY	R0, DT		;R0 <- start of data: position-independent
+		CALL @WRITESTR
+		ADD R0, 5
+		CALL @WRITESTR
+		HALT
+
+		%DATA
+		DB	"Alo"
+		DB	10
+		DB	0
+		DB	"Tchau"
+		DB	0

@@ -1,0 +1,43 @@
+%CODE
+	CALL @start
+	HALT
+@write:
+	PUSH FP
+	CPY  FP, SP
+	LOD  R0, *(FP+8)
+	LOD IR, 2
+	INT 1
+	LOD R0, 10
+	LOD IR, 0
+	INT 1
+	CPY SP, FP
+	POP FP
+	RET
+@start:
+	PUSH FP
+	CPY  FP, SP
+	;allocate 8 local bytes
+	ADD  SP, -8
+	LOD R0, 1
+	STOR *@a, R0
+	LOD R0, 2
+	STOR *(FP-4), R0
+	LOD R0, 3
+	STOR *(FP-8), R0
+	LOD R0, *@a
+	PUSH R0
+	CALL @write
+	LOD R0, *(FP-4)
+	PUSH R0
+	CALL @write
+	LOD R0, *(FP-8)
+	PUSH R0
+	CALL @write
+	CPY SP, FP
+	POP FP
+	RET	
+;end of start
+%DATA
+	@a: RESW 1
+	@b: RESW 1
+	@c: RESW 1

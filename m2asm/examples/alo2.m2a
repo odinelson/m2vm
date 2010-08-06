@@ -1,0 +1,30 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout, but using indirect addressing
+; @author Odilon
+;	
+	;tanto faz a posição dos segmentos...
+	;%DATA
+	;msg1:  DB "Alo", 10	;ends with '\n'
+	;msg2:  DB 'A','l','o',10
+	
+	%CODE
+	LOD	R0 , *msg1:BYTE
+	LOD	IR, 0		;write_char
+	INT	1
+	LOD	R0 , *(DT+1):BYTE
+	INT	1
+	LOD	R0 , *(DT+2):BYTE
+	INT	1
+fim:
+	HALT
+	
+	%DATA
+	msg1:  DB "Alo", 10	;ends with '\n'
+	msg2:  DB 'A','l','o',10
+
+	%STACK
+	RESB  1024
+	
+	; could be in one line, also:
+	; %STACK RESB  1024

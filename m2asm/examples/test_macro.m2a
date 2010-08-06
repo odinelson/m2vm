@@ -1,0 +1,19 @@
+;
+; M2 Assembler Test File
+; Just prints "Alo" to stdout
+; @author Odilon
+;	
+	
+%INCLUDE macros.m2i
+	
+	
+	%CODE
+	PUTCHAR 'A'
+	PUTCHAR 'l'
+	PUTCHAR 'o'
+	PUTCHAR '!'
+	PUTCHAR 10		;'\n'
+	;LOD  R0, 1
+	;LOD  R1, 2
+	;SWAP R0, R1
+	HALT
