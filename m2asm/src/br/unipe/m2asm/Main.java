@@ -20,7 +20,7 @@ import br.unipe.m2asm.util.Util;
  *
  */
 public class Main {
-	private static final String
+	public static final String
 		SRC_EXT = "m2a",
 		INC_EXT = "m2i",
 		OBJ_EXT = "bin",
@@ -34,20 +34,20 @@ public class Main {
 		String fileName = args[0];
 		try {
 			ASTProg raiz = parse(fileName);
-			System.out.println("[ Árvore de Sintaxe Abstrata ]");
-			raiz.dump("");
+			///System.out.println("[ Árvore de Sintaxe Abstrata ]");
+			///raiz.dump("");
 			
 			SymbolTable symTab = new SymbolTable();
 			
 			IncludeResolver resolver0 = new IncludeResolver();
 			resolver0.visit(raiz, symTab);
-			System.out.println("\n[ Árvore de Sintaxe Abstrata, após resolver os %INCLUDES ]");
-			raiz.dump("");
+			///System.out.println("\n[ Árvore de Sintaxe Abstrata, após resolver os %INCLUDES ]");
+			///raiz.dump("");
 			
 			MacroResolver resolver1 = new MacroResolver();
 			resolver1.visit(raiz, symTab);
-			System.out.println("\n[ Árvore de Sintaxe Abstrata, após resolver as macros ]");
-			raiz.dump("");
+			///System.out.println("\n[ Árvore de Sintaxe Abstrata, após resolver as macros ]");
+			///raiz.dump("");
 			
 			//assembly, 1st pass (resolve label addresses, populating symTab)
 			LabelResolver resolver2 = new LabelResolver();
