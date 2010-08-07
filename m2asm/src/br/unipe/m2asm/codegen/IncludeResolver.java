@@ -17,7 +17,7 @@ public class IncludeResolver extends M2AsmParserVisitorAdapter {
 	public void visit(ASTInclude node, SymbolTable data) {
 		super.visit(node, data);
 		ASTStr strNode = (ASTStr) node.jjtGetChild(0);
-		String fileName = strNode.value + ".m2i";  //FIXME detect if extension is not given
+		String fileName = strNode.value + "." +  Main.INC_EXT;  //FIXME detect if extension is not given
 		System.out.println("Including fileName: " + fileName);
 		try {
 			ASTProg newNode = Main.parse(fileName);
