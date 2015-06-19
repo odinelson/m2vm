@@ -1,0 +1,1 @@
+A simple, two-address virtual machine (hence the name), for educational purposes.
